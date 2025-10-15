@@ -402,7 +402,7 @@ def generate_clean_image(prompt, width, height, quality_level):
                 continue  # Try next key
         
         else:
-        st.warning("⚠️ fallback...")
+          st.warning("⚠️ fallback...")
     
     # Fallback to Pollinations if all ClipDrop keys fail
     fallback_apis = [
@@ -670,6 +670,7 @@ st.markdown("""
         <p>Made with 🤍 BY DIVAKAR </p>
     </div>
 """, unsafe_allow_html=True)
+
 
 
 
