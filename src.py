@@ -15,7 +15,7 @@ warnings.filterwarnings('ignore')
 # --- Load configuration from .streamlit/config.toml ---
 def load_config():
     """Load configuration from .streamlit/config.toml file."""
-    config_path = "C:/Users/diva1/OneDrive/Desktop/.streamlit/config.toml"
+    config_path = ".streamlit/config.toml"
     try:
         if os.path.exists(config_path):
             with open(config_path, 'r') as f:
@@ -519,7 +519,7 @@ with col2:
     
     # Show example image
     try:
-        example_img = Image.open("C:/Users/diva1/Downloads/ai_generated_professional.png")
+        example_img = Image.open("images/ai_generated_professional.png")
         image_placeholder.image(
             example_img, 
             caption="Example: AI Generated Professional Image",
@@ -666,4 +666,5 @@ st.markdown("""
         <p>Made with 🤍 BY DIVAKAR M & NEHA S | Internship-2 Project </p>
     </div>
 """, unsafe_allow_html=True)
+
 
