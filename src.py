@@ -363,8 +363,7 @@ def generate_clean_image(prompt, width, height, quality_level):
     if CLIPDROP_KEYS:
         for i, api_key in enumerate(CLIPDROP_KEYS):
             try:
-                st.info(f"🎨 Trying ClipDrop API (Key {i+1}/{len(CLIPDROP_KEYS)})...")
-                        
+                                      
                 headers = {
                     'x-api-key': api_key,
                 }
@@ -382,7 +381,7 @@ def generate_clean_image(prompt, width, height, quality_level):
                 
                 if response.status_code == 200:
                     final_image = Image.open(io.BytesIO(response.content))
-                    st.success(f"✅ High-quality image generated with ClipDrop (Key {i+1})")
+                    st.success(f"✅ High-quality image generated)")
                     
                     # Resize to requested dimensions
                     if final_image.size != (width, height):
@@ -391,25 +390,19 @@ def generate_clean_image(prompt, width, height, quality_level):
                     return final_image
                     
                 elif response.status_code == 401:
-                    st.warning(f"❌ ClipDrop API Key {i+1} unauthorized or expired")
                     continue  # Try next key
                 elif response.status_code == 429:
-                    st.warning(f"⏰ ClipDrop API Key {i+1} rate limited")
-                    continue  # Try next key
+                   continue  # Try next key
                 else:
-                    st.warning(f"❌ ClipDrop API Key {i+1} returned status {response.status_code}")
-                    continue  # Try next key
+                   continue  # Try next key
                     
             except requests.exceptions.Timeout:
-                st.warning(f"⏰ ClipDrop API Key {i+1} timed out...")
                 continue  # Try next key
             except Exception as e:
-                st.warning(f"❌ ClipDrop API Key {i+1} error: {str(e)}")
                 continue  # Try next key
         
-        st.warning("❌ All ClipDrop API keys failed, using fallback...")
-    else:
-        st.warning("⚠️ No ClipDrop API keys configured, using fallback...")
+        else:
+        st.warning("⚠️ fallback...")
     
     # Fallback to Pollinations if all ClipDrop keys fail
     fallback_apis = [
@@ -427,8 +420,7 @@ def generate_clean_image(prompt, width, height, quality_level):
     
     for api in fallback_apis:
         try:
-            st.info(f"🔄 Trying {api['name']} as fallback...")
-            
+                       
             headers = {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
             }
@@ -437,21 +429,18 @@ def generate_clean_image(prompt, width, height, quality_level):
             
             if response.status_code == 200 and response.headers.get('content-type', '').startswith('image'):
                 final_image = Image.open(io.BytesIO(response.content))
-                st.success(f"✅ Image generated with {api['name']}!")
+                st.success(f"✅ Image generated!")
                 break
             else:
-                st.warning(f"❌ {api['name']} returned status {response.status_code}")
-                continue
+               continue
                 
         except requests.exceptions.Timeout:
-            st.warning(f"⏰ {api['name']} timed out...")
             continue
         except Exception as e:
-            st.warning(f"❌ {api['name']} error: {str(e)}")
             continue
     
     if not final_image:
-        st.error("❌ All image generation APIs failed.")
+        st.error("❌ image generation failed.")
         return None
     
     # Apply enhancement/watermark removal based on source
@@ -498,7 +487,7 @@ with col1:
     )
 
     # AI Improve Prompt button
-    if st.button("Improve My Prompt", key="improve_prompt", help="Enhance your prompt for better results"):
+    if st.button("Improve My Prompt♦️", key="improve_prompt", help="Enhance your prompt for better results"):
         if prompt.strip():
             improved_prompt = f"{prompt.strip()}, highly detailed, professional quality, vibrant colors, masterpiece, award-winning, cinematic lighting, 4K resolution"
             st.text_area(
@@ -565,7 +554,7 @@ if generate_btn:
         progress_bar = st.progress(0)
         status_text = st.empty()
         
-        with st.spinner("🎨 Creating your professional image..."):
+        with st.spinner("⭕ Creating your professional image..."):
             try:
                 # Parse size
                 size_map = {
@@ -585,7 +574,7 @@ if generate_btn:
                 if CLIPDROP_API_KEY:
                     status_text.text("🎨 Generating premium quality image with ClipDrop...")
                 else:
-                    status_text.text("🎨 Generating image with fallback API...")
+                    status_text.text("Your image is getting ready 🖌️")
                 
                 # Generate clean image
                 final_image = generate_clean_image(prompt, width, height, quality)
@@ -598,7 +587,7 @@ if generate_btn:
                         status_text.text("🧹 Removing watermarks and artifacts...")
                     
                     progress_bar.progress(90)
-                    status_text.text("✨ Applying final enhancements...")
+                    status_text.text("✔️ Applying final enhancements...")
                     
                     # Store image in session state
                     st.session_state.current_image = final_image
@@ -633,7 +622,7 @@ if generate_btn:
                 else:
                     progress_bar.empty()
                     status_text.empty()
-                    st.error("❌ All image generation APIs are currently unavailable.")
+                    st.error("❌ image generation currently unavailable.")
                     st.info("💡 This usually means the servers are busy. Try again in a few minutes.")
                     
             except Exception as e:
@@ -678,9 +667,10 @@ with col3_tip:
 st.markdown("---")
 st.markdown("""
     <div class='footer'>
-        <p>Made with 🤍 BY DIVAKAR M & NEHA S | Internship-2 Project </p>
+        <p>Made with 🤍 BY DIVAKAR </p>
     </div>
 """, unsafe_allow_html=True)
+
 
 
 
