@@ -296,7 +296,7 @@ with col2:
     # Show example without caption (use a working image)
     try:
         # Try to load your local example image
-        example_img = Image.open("C:/Users/diva1/Downloads/ai_generated_professional.png")
+        example_img = Image.open("images/ai_generated_professional.png")
         image_placeholder.image(
             example_img, 
             caption="Example: AI Generated Professional Image",
@@ -653,4 +653,5 @@ st.markdown("""
         <p>Made with 🤍 BY DIVAKAR M & NEHA S | Internship-2 Project </p>
     </div>
 """, unsafe_allow_html=True)
+
 
