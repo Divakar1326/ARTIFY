@@ -65,7 +65,7 @@ def get_base64_image(image_path):
         return ""
 
 # Convert your PNG to base64
-image_base64 = get_base64_image("C:/Users/diva1/Downloads/a72e924659db437b843d2bfff1eceff3.png")
+image_base64 = get_base64_image("images/a72e924659db437b843d2bfff1eceff3.png")
 
 # Custom CSS for elegant design
 st.markdown(f"""
@@ -666,3 +666,4 @@ st.markdown("""
         <p>Made with 🤍 BY DIVAKAR M & NEHA S | Internship-2 Project </p>
     </div>
 """, unsafe_allow_html=True)
+
