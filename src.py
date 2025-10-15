@@ -45,8 +45,10 @@ def _get_secret(key):
     return ""
 
 # Get API keys
-REMOVEBG_API_KEY = _get_secret("REMOVEBG_API_KEY")
 CLIPDROP_API_KEY = _get_secret("CLIPDROP_API_KEY")
+CLIPDROP_API_KEY_2 = _get_secret("CLIPDROP_API_KEY_2")  # Add second key
+# Create list of ClipDrop API keys
+CLIPDROP_KEYS = [key for key in [CLIPDROP_API_KEY, CLIPDROP_API_KEY_2] if key]
 
 # Configure Streamlit page
 st.set_page_config(
@@ -358,45 +360,58 @@ def generate_clean_image(prompt, width, height, quality_level):
     final_image = None
     
     # Try ClipDrop first (usually no watermarks)
-    if CLIPDROP_API_KEY:
-        try:
+    if CLIPDROP_KEYS:
+        for i, api_key in enumerate(CLIPDROP_KEYS):
+            try:
+                st.info(f"🎨 Trying ClipDrop API (Key {i+1}/{len(CLIPDROP_KEYS)})...")
                         
-            headers = {
-                'x-api-key': CLIPDROP_API_KEY,
-            }
-            
-            files = {
-                'prompt': (None, prompt),
-            }
-            
-            response = requests.post(
-                "https://clipdrop-api.co/text-to-image/v1",
-                headers=headers,
-                files=files,
-                timeout=60
-            )
-            
-            if response.status_code == 200:
-                final_image = Image.open(io.BytesIO(response.content))
-                st.success("✅ High-quality image generated")
+                headers = {
+                    'x-api-key': api_key,
+                }
                 
-                # Resize to requested dimensions
-                if final_image.size != (width, height):
-                    final_image = final_image.resize((width, height), Image.Resampling.LANCZOS)
+                files = {
+                    'prompt': (None, prompt),
+                }
                 
-                return final_image
+                response = requests.post(
+                    "https://clipdrop-api.co/text-to-image/v1",
+                    headers=headers,
+                    files=files,
+                    timeout=60
+                )
                 
-            else:
-                st.warning(f"❌ ClipDrop API returned status {response.status_code}")
-                
-        except requests.exceptions.Timeout:
-            st.warning("⏰ ClipDrop API timed out, trying fallback...")
-        except Exception as e:
-            st.warning(f"❌ ClipDrop API error: {str(e)}")
+                if response.status_code == 200:
+                    final_image = Image.open(io.BytesIO(response.content))
+                    st.success(f"✅ High-quality image generated with ClipDrop (Key {i+1})")
+                    
+                    # Resize to requested dimensions
+                    if final_image.size != (width, height):
+                        final_image = final_image.resize((width, height), Image.Resampling.LANCZOS)
+                    
+                    return final_image
+                    
+                elif response.status_code == 401:
+                    st.warning(f"❌ ClipDrop API Key {i+1} unauthorized or expired")
+                    continue  # Try next key
+                elif response.status_code == 429:
+                    st.warning(f"⏰ ClipDrop API Key {i+1} rate limited")
+                    continue  # Try next key
+                else:
+                    st.warning(f"❌ ClipDrop API Key {i+1} returned status {response.status_code}")
+                    continue  # Try next key
+                    
+            except requests.exceptions.Timeout:
+                st.warning(f"⏰ ClipDrop API Key {i+1} timed out...")
+                continue  # Try next key
+            except Exception as e:
+                st.warning(f"❌ ClipDrop API Key {i+1} error: {str(e)}")
+                continue  # Try next key
+        
+        st.warning("❌ All ClipDrop API keys failed, using fallback...")
     else:
-        st.warning("⚠️ ClipDrop API key not configured, using fallback...")
+        st.warning("⚠️ No ClipDrop API keys configured, using fallback...")
     
-    # Fallback to Pollinations if ClipDrop fails or not configured
+    # Fallback to Pollinations if all ClipDrop keys fail
     fallback_apis = [
         {
             "name": "Pollinations (Enhanced)",
@@ -441,7 +456,7 @@ def generate_clean_image(prompt, width, height, quality_level):
     
     # Apply enhancement/watermark removal based on source
     try:
-        if CLIPDROP_API_KEY and final_image:
+        if final_image and any(CLIPDROP_KEYS):  # If we have ClipDrop keys available
             # ClipDrop images are usually clean, just enhance them
             if quality_level == "Ultra High Quality":
                 final_image = enhance_image_quality(final_image)
@@ -666,6 +681,7 @@ st.markdown("""
         <p>Made with 🤍 BY DIVAKAR M & NEHA S | Internship-2 Project </p>
     </div>
 """, unsafe_allow_html=True)
+
 
 
 
