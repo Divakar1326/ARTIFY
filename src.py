@@ -15,7 +15,7 @@ warnings.filterwarnings('ignore')
 # --- Load configuration from .streamlit/config.toml ---
 def load_config():
     """Load configuration from .streamlit/config.toml file."""
-    config_path = ".streamlit/config.toml"
+    config_path = "C:/Users/diva1/OneDrive/Desktop/.streamlit/config.toml"
     try:
         if os.path.exists(config_path):
             with open(config_path, 'r') as f:
@@ -44,6 +44,10 @@ def _get_secret(key):
         pass
     return ""
 
+# Get API keys
+REMOVEBG_API_KEY = _get_secret("REMOVEBG_API_KEY")
+CLIPDROP_API_KEY = _get_secret("CLIPDROP_API_KEY")
+
 # Configure Streamlit page
 st.set_page_config(
     page_title="ARTIFY",
@@ -61,7 +65,7 @@ def get_base64_image(image_path):
         return ""
 
 # Convert your PNG to base64
-image_base64 = get_base64_image("images/a72e924659db437b843d2bfff1eceff3.png")
+image_base64 = get_base64_image("C:/Users/diva1/Downloads/a72e924659db437b843d2bfff1eceff3.png")
 
 # Custom CSS for elegant design
 st.markdown(f"""
@@ -72,7 +76,7 @@ st.markdown(f"""
         height: 64px;
         color: #ffffff;
         box-shadow: 0 2px 10px rgba(0,0,0,0.25);
-        backdrop-filter: blur(8px);    
+        backdrop-filter: blur(8px);
     }}
 
     /* Main app background with your PNG overlay */
@@ -156,9 +160,7 @@ st.markdown(f"""
         font-weight: 600 !important;
     }}
 
-    /* === Select Box Styling with Gradient Display === */
-
-    /* Main visible select box (the selected item area) */
+    /* Select Box Styling with Gradient Display */
     .stSelectbox [data-baseweb="select"] > div {{
         background: linear-gradient(135deg, #e6f0ff 0%, #d9e6ff 100%) !important;
         color: #000000 !important;
@@ -170,18 +172,15 @@ st.markdown(f"""
         transition: all 0.3s ease !important;
     }}
 
-    /* Dropdown menu styling */
     .stSelectbox [data-baseweb="select"] {{
         background: linear-gradient(135deg, rgba(248, 249, 250, 0.95) 0%, rgba(233, 236, 239, 0.95) 100%) !important;
         border-radius: 10px !important;
     }}
 
-    /* Hover effect */
     .stSelectbox [data-baseweb="select"] > div:hover {{
         background: linear-gradient(135deg, #dbe7ff 0%, #c6d9ff 100%) !important;
     }}
     
-    /* Dropdown options styling */
     .stSelectbox [data-baseweb="popover"] {{
         background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
         border-radius: 10px !important;
@@ -201,7 +200,7 @@ st.markdown(f"""
     }}
     .stButton > button:hover {{ transform: translateY(-2px); }}
 
-    /* AI Improve button - FIXED GRADIENT */
+    /* AI Improve button */
     .stButton > button[key="improve_prompt"] {{
         background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 50%, #3b82f6 100%) !important;
         color: #fff !important;
@@ -237,6 +236,231 @@ st.markdown(f"""
     </style>
 """, unsafe_allow_html=True)
 
+# Enhancement functions for ClipDrop images
+def enhance_image_quality(image):
+    """Enhance ClipDrop image quality without heavy processing."""
+    try:
+        result = image.copy()
+        
+        # Light enhancement for already clean images
+        enhancer = ImageEnhance.Contrast(result)
+        result = enhancer.enhance(1.1)
+        
+        color_enhancer = ImageEnhance.Color(result)
+        result = color_enhancer.enhance(1.15)
+        
+        result = result.filter(ImageFilter.UnsharpMask(radius=1, percent=110, threshold=3))
+        
+        return result
+        
+    except Exception as e:
+        st.warning(f"Quality enhancement failed: {e}")
+        return image
+
+def enhance_image_standard(image):
+    """Standard enhancement for ClipDrop images."""
+    try:
+        result = image.copy()
+        
+        enhancer = ImageEnhance.Contrast(result)
+        result = enhancer.enhance(1.05)
+        
+        color_enhancer = ImageEnhance.Color(result)
+        result = color_enhancer.enhance(1.08)
+        
+        return result
+        
+    except Exception as e:
+        st.warning(f"Standard enhancement failed: {e}")
+        return image
+
+# Watermark removal functions for non-ClipDrop images
+def advanced_watermark_removal(image):
+    """Advanced watermark removal."""
+    try:
+        result = image.copy()
+        
+        # Multiple passes of enhancement
+        for i in range(3):
+            result = result.filter(ImageFilter.GaussianBlur(radius=0.5 + i * 0.3))
+            
+            enhancer = ImageEnhance.Contrast(result)
+            result = enhancer.enhance(1.4 + i * 0.1)
+            
+            color_enhancer = ImageEnhance.Color(result)
+            result = color_enhancer.enhance(1.3 + i * 0.1)
+        
+        result = result.filter(ImageFilter.UnsharpMask(radius=2, percent=150, threshold=3))
+        
+        return result
+        
+    except Exception as e:
+        st.warning(f"Advanced watermark removal failed: {e}")
+        return image
+
+def medium_watermark_removal(image):
+    """Medium quality watermark removal."""
+    try:
+        result = image.copy()
+        
+        for i in range(2):
+            result = result.filter(ImageFilter.GaussianBlur(radius=0.8))
+            
+            enhancer = ImageEnhance.Contrast(result)
+            result = enhancer.enhance(1.5)
+            
+            bright_enhancer = ImageEnhance.Brightness(result)
+            result = bright_enhancer.enhance(1.1)
+            
+            color_enhancer = ImageEnhance.Color(result)
+            result = color_enhancer.enhance(1.4)
+        
+        result = result.filter(ImageFilter.UnsharpMask(radius=1.5, percent=120, threshold=2))
+        
+        return result
+        
+    except Exception as e:
+        st.warning(f"Medium watermark removal failed: {e}")
+        return image
+
+def simple_watermark_removal_v2(image):
+    """Simple watermark removal."""
+    try:
+        result = image.copy()
+        
+        result = result.filter(ImageFilter.GaussianBlur(radius=1.0))
+        
+        enhancer = ImageEnhance.Contrast(result)
+        result = enhancer.enhance(1.8)
+        
+        color_enhancer = ImageEnhance.Color(result)
+        result = color_enhancer.enhance(1.6)
+        
+        bright_enhancer = ImageEnhance.Brightness(result)
+        result = bright_enhancer.enhance(1.15)
+        
+        try:
+            result = result.filter(ImageFilter.UnsharpMask(radius=2, percent=140, threshold=3))
+        except:
+            result = result.filter(ImageFilter.SHARPEN)
+            result = result.filter(ImageFilter.SHARPEN)
+        
+        return result
+        
+    except Exception as e:
+        st.warning(f"Simple watermark removal failed: {e}")
+        return image
+
+# Main image generation function
+def generate_clean_image(prompt, width, height, quality_level):
+    """Generate clean, professional image using ClipDrop API with Pollinations fallback."""
+    
+    final_image = None
+    
+    # Try ClipDrop first (usually no watermarks)
+    if CLIPDROP_API_KEY:
+        try:
+                        
+            headers = {
+                'x-api-key': CLIPDROP_API_KEY,
+            }
+            
+            files = {
+                'prompt': (None, prompt),
+            }
+            
+            response = requests.post(
+                "https://clipdrop-api.co/text-to-image/v1",
+                headers=headers,
+                files=files,
+                timeout=60
+            )
+            
+            if response.status_code == 200:
+                final_image = Image.open(io.BytesIO(response.content))
+                st.success("✅ High-quality image generated")
+                
+                # Resize to requested dimensions
+                if final_image.size != (width, height):
+                    final_image = final_image.resize((width, height), Image.Resampling.LANCZOS)
+                
+                return final_image
+                
+            else:
+                st.warning(f"❌ ClipDrop API returned status {response.status_code}")
+                
+        except requests.exceptions.Timeout:
+            st.warning("⏰ ClipDrop API timed out, trying fallback...")
+        except Exception as e:
+            st.warning(f"❌ ClipDrop API error: {str(e)}")
+    else:
+        st.warning("⚠️ ClipDrop API key not configured, using fallback...")
+    
+    # Fallback to Pollinations if ClipDrop fails or not configured
+    fallback_apis = [
+        {
+            "name": "Pollinations (Enhanced)",
+            "url": f"https://image.pollinations.ai/prompt/{quote(prompt)}?width={width}&height={height}&seed={hash(prompt) % 1000}&enhance=true&nologo=true",
+            "timeout": 60
+        },
+        {
+            "name": "Pollinations (Standard)",
+            "url": f"https://image.pollinations.ai/prompt/{quote(prompt)}?width={width}&height={height}",
+            "timeout": 45
+        }
+    ]
+    
+    for api in fallback_apis:
+        try:
+            st.info(f"🔄 Trying {api['name']} as fallback...")
+            
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+            }
+            
+            response = requests.get(api["url"], timeout=api["timeout"], headers=headers)
+            
+            if response.status_code == 200 and response.headers.get('content-type', '').startswith('image'):
+                final_image = Image.open(io.BytesIO(response.content))
+                st.success(f"✅ Image generated with {api['name']}!")
+                break
+            else:
+                st.warning(f"❌ {api['name']} returned status {response.status_code}")
+                continue
+                
+        except requests.exceptions.Timeout:
+            st.warning(f"⏰ {api['name']} timed out...")
+            continue
+        except Exception as e:
+            st.warning(f"❌ {api['name']} error: {str(e)}")
+            continue
+    
+    if not final_image:
+        st.error("❌ All image generation APIs failed.")
+        return None
+    
+    # Apply enhancement/watermark removal based on source
+    try:
+        if CLIPDROP_API_KEY and final_image:
+            # ClipDrop images are usually clean, just enhance them
+            if quality_level == "Ultra High Quality":
+                final_image = enhance_image_quality(final_image)
+            elif quality_level == "High Quality":
+                final_image = enhance_image_standard(final_image)
+        else:
+            # Apply watermark removal for other APIs
+            if quality_level == "Ultra High Quality":
+                final_image = advanced_watermark_removal(final_image)
+            elif quality_level == "High Quality":
+                final_image = medium_watermark_removal(final_image)
+            else:
+                final_image = simple_watermark_removal_v2(final_image)
+                
+    except Exception as e:
+        st.warning(f"Processing failed: {e}")
+    
+    return final_image
+
 # Title and subtitle
 st.markdown(
     '<p class="title" style="font-size:60px; font-weight:bold; text-align:center;">AI Image Generator</p>',
@@ -258,7 +482,7 @@ with col1:
         help="Describe what you want to see in detail. Be specific about style, colors, mood, and composition."
     )
 
-    # AI Improve Prompt button (removed clear button)
+    # AI Improve Prompt button
     if st.button("Improve Prompt with AI", key="improve_prompt", help="Enhance your prompt for better results"):
         if prompt.strip():
             improved_prompt = f"{prompt.strip()}, highly detailed, professional quality, vibrant colors, masterpiece, award-winning, cinematic lighting, 4K resolution"
@@ -285,7 +509,7 @@ with col1:
         help="Higher quality takes longer but produces better results"
     )
 
-
+   
     generate_btn = st.button("Generate Professional Image", use_container_width=True)
 
 with col2:
@@ -293,247 +517,40 @@ with col2:
     st.markdown("### Generated Image")
     image_placeholder = st.empty()
     
-    # Show example without caption (use a working image)
+    # Show example image
     try:
-        # Try to load your local example image
-        example_img = Image.open("images/ai_generated_professional.png")
+        example_img = Image.open("C:/Users/diva1/Downloads/ai_generated_professional.png")
         image_placeholder.image(
             example_img, 
             caption="Example: AI Generated Professional Image",
             use_container_width=True
         )
     except:
-        # Fallback to a placeholder if local image doesn't exist
         st.markdown(
-    """
-    <div style='text-align: center;'>
-        <img src='https://via.placeholder.com/1024x1024/667eea/ffffff?text=Your+Generated+Image+Will+Appear+Here'
-             width='100' style='border-radius:15px;'>
-        <p style='font-size:16px; color:gray;'>Preview: Your generated image will appear here</p>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-
+            """
+            <div style='text-align: center;'>
+                <img src='https://via.placeholder.com/1024x1024/667eea/ffffff?text=Your+Generated+Image+Will+Appear+Here'
+                     width='100' style='border-radius:15px;'>
+                <p style='font-size:16px; color:gray;'>Preview: Your generated image will appear here</p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
 # Store the current image in session state
 if 'current_image' not in st.session_state:
     st.session_state.current_image = None
 
-# Hidden image generation function
-def generate_clean_image(prompt, width, height, quality_level):
-    """Generate clean, professional image with advanced watermark removal."""
-    
-    # Step 1: Generate with Pollinations
-    url = f"https://image.pollinations.ai/prompt/{quote(prompt)}?width={width}&height={height}&seed={hash(prompt) % 1000}&enhance=true"
-    
-    try:
-        response = requests.get(url, timeout=60, headers={"User-Agent": "Mozilla/5.0"})
-        if response.status_code == 200 and response.headers.get('content-type', '').startswith('image'):
-            raw_image = Image.open(io.BytesIO(response.content))
-        else:
-            return None
-    except Exception:
-        return None
-    
-    # Step 2: Try multiple watermark removal methods
-    cleaned_image = None
-    
-    # Try ClipDrop first (if API key available)
-    if _get_secret("CLIPDROP_API_KEY"):
-        cleaned_image = remove_watermark_clipdrop(raw_image)
-        if cleaned_image:
-            return cleaned_image
-    
-    # Try advanced inpainting-style removal
-    if quality_level == "Ultra High Quality":
-        cleaned_image = remove_watermark_inpaint_style(raw_image)
-    elif quality_level == "High Quality":
-        cleaned_image = remove_watermark_photopea_style(raw_image)
-    else:
-        cleaned_image = simple_watermark_removal_v2(raw_image)
-    
-    return cleaned_image if cleaned_image else raw_image
-
-def remove_watermark_clipdrop(image):
-    """Remove watermark using ClipDrop API (better for watermarks)."""
-    CLIPDROP_API_KEY = _get_secret("CLIPDROP_API_KEY")
-    if not CLIPDROP_API_KEY:
-        return None
-    
-    try:
-        img_bytes = io.BytesIO()
-        image.save(img_bytes, format='PNG')
-        img_bytes.seek(0)
-        
-        response = requests.post(
-            'https://clipdrop-api.co/remove-text/v1',
-            files={'image_file': ('image.png', img_bytes, 'image/png')},
-            headers={'x-api-key': CLIPDROP_API_KEY},
-            timeout=60
-        )
-        
-        if response.status_code == 200:
-            cleaned_img = Image.open(io.BytesIO(response.content))
-            return cleaned_img
-        
-    except Exception:
-        pass
-    
-    return None
-
-def remove_watermark_photopea_style(image):
-    """Advanced watermark removal using image processing techniques."""
-    try:
-        import numpy as np
-        from PIL import ImageOps, ImageChops
-        
-        # Convert to numpy for advanced processing
-        img_array = np.array(image)
-        
-        # Method 1: Content-aware fill simulation
-        # Create mask for potential watermark areas (usually bottom-right)
-        height, width = img_array.shape[:2]
-        
-        # Clone nearby pixels to cover watermark area
-        # Focus on bottom-right corner where pollinations watermark appears
-        watermark_region = img_array[int(height*0.85):, int(width*0.7):]
-        
-        if watermark_region.size > 0:
-            # Sample from nearby clean area
-            clean_region = img_array[int(height*0.7):int(height*0.85), int(width*0.5):int(width*0.7)]
-            
-            if clean_region.size > 0:
-                # Replace watermark area with nearby pixels
-                for i in range(watermark_region.shape[0]):
-                    for j in range(watermark_region.shape[1]):
-                        if i < clean_region.shape[0] and j < clean_region.shape[1]:
-                            img_array[int(height*0.85) + i, int(width*0.7) + j] = clean_region[i, j]
-        
-        # Convert back to PIL
-        temp_img = Image.fromarray(img_array)
-        
-        # Method 2: Advanced blending
-        # Create multiple processed versions and blend
-        blur1 = temp_img.filter(ImageFilter.GaussianBlur(radius=1.5))
-        blur2 = temp_img.filter(ImageFilter.GaussianBlur(radius=0.8))
-        
-        # Blend the blurred versions
-        blended = ImageChops.blend(blur1, blur2, 0.6)
-        
-        # Enhance contrast and color
-        enhancer = ImageEnhance.Contrast(blended)
-        enhanced = enhancer.enhance(1.4)
-        
-        color_enhancer = ImageEnhance.Color(enhanced)
-        color_enhanced = color_enhancer.enhance(1.3)
-        
-        # Apply strong unsharp mask
-        final = color_enhanced.filter(ImageFilter.UnsharpMask(radius=3, percent=180, threshold=1))
-        
-        return final
-        
-    except Exception as e:
-        # Fallback to simpler method
-        return simple_watermark_removal_v2(image)
-
-def simple_watermark_removal_v2(image):
-    """Improved simple watermark removal."""
-    try:
-        # Method: Multiple passes with different techniques
-        result = image.copy()
-        
-        # Pass 1: Heavy blur + contrast
-        result = result.filter(ImageFilter.GaussianBlur(radius=2.0))
-        enhancer = ImageEnhance.Contrast(result)
-        result = enhancer.enhance(1.8)
-        
-        # Pass 2: Color boost
-        color_enhancer = ImageEnhance.Color(result)
-        result = color_enhancer.enhance(1.6)
-        
-        # Pass 3: Brightness adjustment
-        bright_enhancer = ImageEnhance.Brightness(result)
-        result = bright_enhancer.enhance(1.15)
-        
-        # Pass 4: Strong sharpening to restore details
-        result = result.filter(ImageFilter.UnsharpMask(radius=4, percent=250, threshold=0))
-        
-        # Pass 5: Final contrast boost
-        final_enhancer = ImageEnhance.Contrast(result)
-        result = final_enhancer.enhance(1.2)
-        
-        return result
-        
-    except Exception:
-        return image
-
-def remove_watermark_inpaint_style(image):
-    """Simulate inpainting for watermark removal."""
-    try:
-        import numpy as np
-        
-        img_array = np.array(image)
-        height, width = img_array.shape[:2]
-        
-        # Target the typical pollinations watermark location (bottom-right)
-        # Create a more aggressive replacement strategy
-        
-        # Define watermark region (bottom-right corner)
-        wm_start_h = int(height * 0.88)
-        wm_start_w = int(width * 0.75)
-        
-        # Sample clean pixels from multiple areas
-        sample_regions = [
-            img_array[int(height*0.6):int(height*0.8), int(width*0.4):int(width*0.6)],  # Middle area
-            img_array[int(height*0.4):int(height*0.6), int(width*0.6):int(width*0.8)],  # Upper right
-            img_array[int(height*0.7):int(height*0.85), int(width*0.3):int(width*0.5)]  # Lower left
-        ]
-        
-        # Replace watermark area with blended samples
-        for i in range(wm_start_h, height):
-            for j in range(wm_start_w, width):
-                # Blend pixels from different sample regions
-                pixel_samples = []
-                for region in sample_regions:
-                    if region.size > 0:
-                        # Get corresponding pixel from sample region
-                        sample_i = (i - wm_start_h) % region.shape[0]
-                        sample_j = (j - wm_start_w) % region.shape[1]
-                        pixel_samples.append(region[sample_i, sample_j])
-                
-                if pixel_samples:
-                    # Average the sampled pixels
-                    avg_pixel = np.mean(pixel_samples, axis=0).astype(np.uint8)
-                    img_array[i, j] = avg_pixel
-        
-        # Convert back and apply smoothing
-        result = Image.fromarray(img_array)
-        
-        # Apply smoothing filter to blend the inpainted area
-        result = result.filter(ImageFilter.SMOOTH_MORE)
-        
-        # Enhance the final result
-        enhancer = ImageEnhance.Contrast(result)
-        result = enhancer.enhance(1.3)
-        
-        return result
-        
-    except Exception:
-        return image
-
-# Alternative watermark removal using different API approach
-
 # Generation logic
 if generate_btn:
     if not prompt.strip():
-        st.success("⚠️ Please enter a prompt to generate an image.")
+        st.warning("⚠️ Please enter a prompt to generate an image.")
     else:
         # Show progressive status
         progress_bar = st.progress(0)
         status_text = st.empty()
         
-        with st.spinner("⭕ Creating your professional image..."):
+        with st.spinner("🎨 Creating your professional image..."):
             try:
                 # Parse size
                 size_map = {
@@ -546,34 +563,28 @@ if generate_btn:
                 
                 # Update progress
                 progress_bar.progress(20)
-                status_text.text("🤖 AI analyzing your prompt...")
+                status_text.text("🧠 AI analyzing your prompt...")
                 
                 # Update progress
                 progress_bar.progress(40)
-                status_text.text("🖌️ Generating high-quality image...")
+                if CLIPDROP_API_KEY:
+                    status_text.text("🎨 Generating premium quality image with ClipDrop...")
+                else:
+                    status_text.text("🎨 Generating image with fallback API...")
                 
-                # Generate clean image (this hides all the watermark removal)
+                # Generate clean image
                 final_image = generate_clean_image(prompt, width, height, quality)
                 
-                progress_bar.progress(70)
-                status_text.text("🧹 Removing watermarks and artifacts...")
-                
-                progress_bar.progress(90)
-                status_text.text("✨ Applying final enhancements...")
-                
-                # Final enhancement pass
                 if final_image:
-                    try:
-                        # One more enhancement pass
-                        enhancer = ImageEnhance.Contrast(final_image)
-                        final_image = enhancer.enhance(1.1)
-                        
-                        sat_enhancer = ImageEnhance.Color(final_image)
-                        final_image = sat_enhancer.enhance(1.1)
-                    except:
-                        pass
-                
-                if final_image:
+                    progress_bar.progress(70)
+                    if CLIPDROP_API_KEY:
+                        status_text.text("✨ Enhancing ClipDrop image...")
+                    else:
+                        status_text.text("🧹 Removing watermarks and artifacts...")
+                    
+                    progress_bar.progress(90)
+                    status_text.text("✨ Applying final enhancements...")
+                    
                     # Store image in session state
                     st.session_state.current_image = final_image
                     
@@ -603,16 +614,18 @@ if generate_btn:
                             use_container_width=True
                         )
                     
-                    st.success("✅ Professional image generated successfully!")
+                   
                 else:
                     progress_bar.empty()
                     status_text.empty()
-                    st.error("❌ Failed to generate image. Please try again.")
+                    st.error("❌ All image generation APIs are currently unavailable.")
+                    st.info("💡 This usually means the servers are busy. Try again in a few minutes.")
                     
             except Exception as e:
                 progress_bar.empty()
                 status_text.empty()
-                st.error(f"❌ An error occurred: {str(e)}")
+                st.error(f"❌ An unexpected error occurred: {str(e)}")
+                st.info("💡 Try refreshing the page or using a simpler prompt.")
 
 # Tips section
 st.markdown("---")
@@ -653,6 +666,3 @@ st.markdown("""
         <p>Made with 🤍 BY DIVAKAR M & NEHA S | Internship-2 Project </p>
     </div>
 """, unsafe_allow_html=True)
-
-
-
