@@ -44,9 +44,6 @@ def _get_secret(key):
         pass
     return ""
 
-# Get Remove.bg API key
-REMOVEBG_API_KEY = _get_secret("REMOVEBG_API_KEY")
-
 # Configure Streamlit page
 st.set_page_config(
     page_title="ARTIFY",
@@ -64,7 +61,7 @@ def get_base64_image(image_path):
         return ""
 
 # Convert your PNG to base64
-image_base64 = get_base64_image("C:/Users/diva1/Downloads/a72e924659db437b843d2bfff1eceff3.png")
+image_base64 = get_base64_image("images/a72e924659db437b843d2bfff1eceff3.png")
 
 # Custom CSS for elegant design
 st.markdown(f"""
@@ -75,7 +72,7 @@ st.markdown(f"""
         height: 64px;
         color: #ffffff;
         box-shadow: 0 2px 10px rgba(0,0,0,0.25);
-        backdrop-filter: blur(8px);
+        backdrop-filter: blur(8px);    
     }}
 
     /* Main app background with your PNG overlay */
@@ -656,3 +653,4 @@ st.markdown("""
         <p>Made with 🤍 BY DIVAKAR M & NEHA S | Internship-2 Project </p>
     </div>
 """, unsafe_allow_html=True)
+
