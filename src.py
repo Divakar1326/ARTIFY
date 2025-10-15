@@ -15,7 +15,7 @@ warnings.filterwarnings('ignore')
 # --- Load configuration from .streamlit/config.toml ---
 def load_config():
     """Load configuration from .streamlit/config.toml file."""
-    config_path = "C:/Users/diva1/OneDrive/Desktop/.streamlit/config.toml"
+    config_path = ".streamlit/config.toml"
     try:
         if os.path.exists(config_path):
             with open(config_path, 'r') as f:
@@ -653,5 +653,6 @@ st.markdown("""
         <p>Made with 🤍 BY DIVAKAR M & NEHA S | Internship-2 Project </p>
     </div>
 """, unsafe_allow_html=True)
+
 
 
