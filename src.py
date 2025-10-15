@@ -477,13 +477,13 @@ with col1:
     
     prompt = st.text_area(
         "Enter your prompt",
-        placeholder="A majestic dragon soaring over a medieval castle at sunset, dark silhouette against vibrant orange and red sky, detailed scales, powerful wings spread wide, fantasy art style, cinematic lighting, highly detailed, professional quality, award-winning digital art, 4K resolution",
+        placeholder="Type here...",
         height=120,
         help="Describe what you want to see in detail. Be specific about style, colors, mood, and composition."
     )
 
     # AI Improve Prompt button
-    if st.button("Improve Prompt with AI", key="improve_prompt", help="Enhance your prompt for better results"):
+    if st.button("Improve My Prompt", key="improve_prompt", help="Enhance your prompt for better results"):
         if prompt.strip():
             improved_prompt = f"{prompt.strip()}, highly detailed, professional quality, vibrant colors, masterpiece, award-winning, cinematic lighting, 4K resolution"
             st.text_area(
@@ -666,6 +666,7 @@ st.markdown("""
         <p>Made with 🤍 BY DIVAKAR M & NEHA S | Internship-2 Project </p>
     </div>
 """, unsafe_allow_html=True)
+
 
 
 
