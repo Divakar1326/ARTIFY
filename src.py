@@ -519,7 +519,7 @@ with col2:
     
     # Show example image
     try:
-        example_img = Image.open("images/ai_generated_professional 1 .png")
+        example_img = Image.open("images/ai_generated_professional.png")
         image_placeholder.image(
             example_img, 
             caption="Example: AI Generated Professional Image",
@@ -666,6 +666,7 @@ st.markdown("""
         <p>Made with 🤍 BY DIVAKAR M & NEHA S | Internship-2 Project </p>
     </div>
 """, unsafe_allow_html=True)
+
 
 
 
